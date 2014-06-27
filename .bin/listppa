@@ -1,0 +1,39 @@
+#!/bin/bash 
+# listppa Script to get all the PPA installed on a system ready to share for reininstall
+for APT in `find /etc/apt/ -name \*.list`; do
+    grep -o "^deb http://ppa.launchpad.net/[a-z0-9\-]\+/[a-z0-9\-]\+" $APT | while read ENTRY ; do
+        USER=`echo $ENTRY | cut -d/ -f4`
+        PPA=`echo $ENTRY | cut -d/ -f5`
+#        echo sudo apt-add-repository ppa:$USER/$PPA
+    done
+done
+
+#! /bin/sh
+# Script to get all the PPA installed on a system
+
+HR="-----------------------------------------------------------------------"
+#PPAs=()
+#DEBs=()
+toggle=0
+i=0
+for APT in `find /etc/apt/ -name \*.list`; do
+#    grep -Po "(?<=^deb\s).*?(?=#|$)" $APT | while read ENTRY ; do
+	while read ENTRY ; do
+    	i=$((i+1))
+        HOST=`echo $ENTRY | cut -d/ -f3`
+        USER=`echo $ENTRY | cut -d/ -f4`
+        PPA=`echo $ENTRY | cut -d/ -f5`
+        #echo sudo apt-add-repository ppa:$USER/$PPA
+        if [ "ppa.launchpad.net" = "$HOST" ]; then
+            [[ $toggle -eq 1 ]] && echo -e "$HR\n" 
+#            echo sudo apt-add-repository ppa:$USER/$PPA
+            printf "%3s) ppa: %30s | %s\n" $i $USER $PPA ;
+            toggle=0;
+        else
+	    	[[ $toggle -eq 0 ]] && echo -e "\n$HR" ;
+#            echo sudo apt-add-repository \'${ENTRY}\'
+            printf "%3s) deb: %s\n" $i "$ENTRY" ;
+            toggle=1 ;
+        fi
+    done < <(grep -Po "(?<=^deb\s).*?(?=#|$)" $APT)
+done

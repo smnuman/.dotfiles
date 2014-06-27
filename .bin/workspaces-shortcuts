@@ -1,0 +1,14 @@
+#!/bin/bash
+
+case $1 in 
+rows)t=v;;
+cols)t=h;;
+esac;
+
+check=`gconftool-2 --get /apps/compiz-1/general/screen0/options/${t}size`
+
+if [[ ! ($2 = - && $check < 2 ) ]]
+then
+    [[ $2 = [-+] ]] && gconftool-2 --set /apps/compiz-1/general/screen0/options/${t}size --type int $(( $check $2 1 ))
+fi
+

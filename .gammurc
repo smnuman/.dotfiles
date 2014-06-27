@@ -1,0 +1,7 @@
+[gammu]
+device = 28:FB:D3:54:29:F5
+connection = at
+synchronizetime = no
+logformat = nothing
+port = /dev/usb/tts/1
+

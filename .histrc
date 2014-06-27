@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+#  From: http://lukas.zapletalovi.com/2013/03/never-lost-your-bash-history-again.html
+#
+# This script creates monthly backups of the bash history file. Make sure you have
+# HISTSIZE set to large number (more than number of commands you can type in every
+# month). It keeps last 200 commands when it "rotates" history file every month.
+# Typical usage in a bash profile:
+#
+# HISTSIZE=90000
+# source ~/bin/history-backup
+#
+# And to search whole history use:
+# grep xyz -h --color ~/.bash_history.*
+#
+
+# KEEP=200									# number of histories to keep in the .bash_history
+# BASH_HIST=~/.bash_history					# history file name
+# BACKUPDIR=~/.sh_history
+# BACKUP=$BACKUPDIR/bash_hist.$(date +%y%m%d).$(date +%H)		# name of history_backup file with appended date-time info
+
+# if [ -s "$BASH_HIST" -a "$BASH_HIST" -nt "$BACKUP" ]; then
+#   # history file is newer then backup
+#   if [[ -f $BACKUP ]]; then
+#     # there is already a backup
+#     \cp -f $BASH_HIST $BACKUP
+#   else
+#     # create new backup, leave last few commands and reinitialize
+#     mv -f $BASH_HIST $BACKUP
+#     tail -n$KEEP $BACKUP > $BASH_HIST
+#     history -r
+#   fi
+# fi
+
+#
+# Copied from: http://unix.stackexchange.com/a/48116/52861
+#
+HISTSIZE=9000
+HISTFILESIZE=$HISTSIZE
+HISTCONTROL=ignorespace:ignoredups
+
+history() {
+  _bash_history_sync
+  builtin history "$@"
+}
+
+_bash_history_sync() {
+  builtin history -n         #1 		#  reads from .bash_history the commands saved from any other terminal
+  builtin history -w         #1A 		#  saves the history to file and erase duplicates
+  HISTFILESIZE=$HISTSIZE     #2 		#  Setting the special variable $HISTFILESIZE to some value will cause Bash to truncate $HISTFILE to be no longer than $HISTFILESIZE lines by removing the oldest entries
+  builtin history -c         #3 		#  prevents trashing the history buffer after each command
+  builtin history -r         #4 		#  restore the history buffer from file, thus finally making the history shared across terminal sessions
+}
+
+PROMPT_COMMAND="_bash_history_sync; $PROMPT_COMMAND"
+
+#
+#  Following ones are from here: http://askubuntu.com/a/376417/176470
+#  ...and from here: http://unix.stackexchange.com/a/18443/52861
+#
+alias hist='fc  -l' 	#lists the 16 most recent commands.
+alias h='history'
+
+export CUSTOM_HISTFILE="/tmp/bash_history" #path of the new history file
+# export PROMPT_COMMAND="history -a; history -c; history -r; date | xargs echo -n >>$CUSTOM_HISTFILE; echo -n ' - ' >>$CUSTOM_HISTFILE; pwd | xargs echo -n >>$CUSTOM_HISTFILE; echo -n ' - ' >>$CUSTOM_HISTFILE; tail -n 1 $HISTFILE >>$CUSTOM_HISTFILE; $PROMPT_COMMAND"
+#  From: http://unix.stackexchange.com/a/18443/52861
+#PROMPT_COMMAND="history -n; history -w; history -c; history -r; $PROMPT_COMMAND"
+
+#export HISTTIMEFORMAT="%F %T "
+
+alias hc='cat ${CUSTOM_HISTFILE}'					#  show history file
+alias hw='watch -n1 "tail -n20 .bash_history"'		#  watch history work

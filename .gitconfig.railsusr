@@ -1,0 +1,11 @@
+[user]
+	name = Rails User
+	email = railsusr@gmail.com
+[alias]
+	co = checkout
+[core]
+	editor = subl
+[credential]
+	helper = cache --timeout=3600
+[branch]
+	autosetuprebase = always

@@ -1,0 +1,264 @@
+#!/bin/bash
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Borrowed from: http://tldp.org/LDP/abs/html/sample-bashrc.html
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Prompt entry...
+echo -e "${BCyan}This is BASH ${BRed}${BASH_VERSION%.*}${BCyan}\
+ - DISPLAY on ${BRed}$DISPLAY${NC}\n"
+date
+if [ -x /usr/games/fortune ]; then
+    /usr/games/fortune -s     # Makes our day a bit more fun.... :-)
+fi
+
+# Prompt exit!
+function _exit()              # Function to run upon exit of shell.
+{
+    echo -e "${BRed}Hasta la vista, baby${NC}"
+}
+trap _exit EXIT
+
+#-------------------------------------------------------------
+# Shell Prompt - for many examples, see:
+#       http://www.debian-administration.org/articles/205
+#       http://www.askapache.com/linux/bash-power-prompt.html
+#       http://tldp.org/HOWTO/Bash-Prompt-HOWTO
+#       https://github.com/nojhan/liquidprompt
+#-------------------------------------------------------------
+# Current Format: [TIME USER@HOST PWD] >
+# TIME:
+#    Green     == machine load is low
+#    Orange    == machine load is medium
+#    Red       == machine load is high
+#    ALERT     == machine load is very high
+# USER:
+#    Cyan      == normal user       # old way, original
+#    Green     == normal user       # presently done -- Numan
+#    Orange    == SU to user
+#    Red       == root
+# HOST:
+#    Cyan      == local session
+#    Green     == secured remote connection (via ssh)
+#    Red       == unsecured remote connection
+# PWD:
+#    Green     == more than 10% free disk space
+#    Orange    == less than 10% free disk space
+#    ALERT     == less than 5% free disk space
+#    Red       == current user does not have write privileges
+#    Cyan      == current filesystem is size zero (like /proc)
+# >:
+#    White     == no background or suspended jobs in this shell
+#    Cyan      == at least one background job in this shell
+#    Orange    == at least one suspended job in this shell
+#
+#    Command is added to the history file each time you hit enter,
+#    so it's available to all shells (using 'history -a').
+
+# prompt help strings and functions
+PH=""
+LDC=""
+DSK=""
+JBC=""
+HR="\n+-------------------- What the PROMPT says --------------------"
+SS="\n| - "
+function CurD(){ echo ${PWD/"$HOME"/"~"}; }
+
+# Test connection type:
+function con_type()
+{
+	if [ -n "${SSH_CONNECTION}" ]; then
+	    CNX=${Green}        # Connected on remote machine, via ssh (good).
+	    PH=${PH}"${SS}The system is connected to a remote machine (${CNX}via ssh${NC})."
+	elif [[ "${DISPLAY%%:0*}" != "" ]]; then
+	    CNX=${ALERT}        # Connected on remote machine, not via ssh (bad).
+	    PH=${PH}"${SS}The system is connected to a remote machine (${CNX}without ssh${NC})."
+	else
+	    CNX=${BYellow}        # Connected on local machine.
+	    PH=${PH}"${SS}The system is a ${CNX}local${NC} machine."
+	fi
+}
+#con_type
+
+# Test user type:
+function usr_type()
+{
+	if [[ ${USER} == "root" ]]; then
+	    SU=${Red}           # User is root.
+	    DBG=${On_Yellow}	# A deep bg
+#	    PH=${PH}"${SS}You(${SU}$(logname)${NC}) are working on ${DBG} $(CurD) ${NC} as ${SU}${USER}${NC}."
+	elif [[ ${USER} != $(logname) ]]; then
+	    SU=${BRed}          # User is not login user.
+	    DBG=${On_Red}	# A deep bg
+#	    PH=${PH}"${SS}You(${BGreen}$(logname)${NC}) are working on ${DBG} $(CurD) ${NC} as ${SU}${USER}${NC}."
+	else
+	    SU=${BGreen}        # User is normal (well ... most of us are).
+	    DBG=${On_Green}	# A deep bg
+#	    PH=${PH}"${SS}You(${SU}$(logname)${NC}) are currently working on $(disk_color)${DBG} $(CurD) ${NC}."
+	fi
+	
+	PH=${PH}"${SS}You(${BGreen}$(logname)${NC}) are working on $(disk_color)${DBG} $(CurD) ${NC}"
+	[[ ${USER} != $(logname) ]] && PH=${PH}" as ${SU}${USER}${NC}." || PH=${PH}"."
+}
+#usr_type
+
+#  Numan's mod: add background. Also $BGreen instead of $BCyan above for normal user.
+#  Set a background. Also there is a DeepBackground($DBG) set above according to the user!
+BG=${On_Black}
+CNX=$CNX"${BG}"
+SU=$SU"${BG}"
+AT=${BCyan}"${BG}"
+
+
+NCPU=$(grep -c 'processor' /proc/cpuinfo)    # Number of CPUs
+SLOAD=$(( 100*${NCPU} ))        # Small load
+MLOAD=$(( 200*${NCPU} ))        # Medium load
+XLOAD=$(( 400*${NCPU} ))        # Xlarge load
+
+# Returns system load as percentage, i.e., '40' rather than '0.40)'.
+function load()
+{
+    # local SYSLOAD=$(cut -d " " -f1 /proc/loadavg | tr -d '.')
+    local SYSLOAD=$(cut -d " " -f1 /proc/loadavg | tr -d '.')
+    # System load of the current host.
+    echo $((10#$SYSLOAD))       # Convert to decimal.
+}
+
+# Returns a color indicating system load.
+function load_color()
+{
+    local SYSLOAD=$(load)
+    if [ ${SYSLOAD} -gt ${XLOAD} ]; then
+        echo -en ${ALERT}
+    	LDC="${SS}The system is running on ${ALERT} EXTRA LOAD ($(load)%) ${NC}.\n|\tReduce it by closing some tasks on background\n|\tas well as on foreground **OR** \n|\trisk crashing the OS altogether."
+    elif [ ${SYSLOAD} -gt ${MLOAD} ]; then
+        echo -en ${BRed}
+    	LDC="${SS}The system is on ${BRed}medium load ($(load)%)${NC}.\n|\t** Reduce the load **"
+    elif [ ${SYSLOAD} -gt ${SLOAD} ]; then
+        echo -en ${BYellow}
+    	LDC="${SS}The sytem has ${BYellow}$(load)% workload${NC} on it!"
+    else
+        echo -en ${BGreen}
+    	LDC="${SS}The system load appears ${BGreen}normal${NC} ($(load)%)."
+    fi
+}
+
+
+# Returns a color according to free disk space in $PWD.
+function disk_color()
+{
+    if [ ! -w "${PWD}" ] ; then
+        # No 'write' privilege in the current directory.
+        echo -en ${Red}
+        DSK="${SS}You ${On_Red} DO NOT have ${NC}${BRed} write previllege${NC} on this folder."
+    elif [ -s "${PWD}" ] ; then
+        local used=$(command df -P "$PWD" |
+                   awk 'END {print $5} {sub(/%/,"")}')
+        if [ ${used} -gt 95 ]; then
+            echo -en ${ALERT}           # Disk almost full (>95%).
+            DSK="${SS}${ALERT}Carefull: The DISK is full!\n\tMake some space on disk and please restart ASAP!${NC}"
+        elif [ ${used} -gt 90 ]; then
+            echo -en ${BRed}            # Free disk space almost gone.
+            DSK="${SS}The disk${BRed}do not have any free space${NC}. Make some space to run smoothly."
+        else
+            echo -en ${BWhite}           # Free disk space is ok.
+            DSK="${SS}The Disk has ample free space."
+        fi
+    else
+        # Current directory is size '0' (like /proc, /sys etc).
+        echo -en ${Cyan}
+        DSK="${SS}${Cyan}The current directory has a size of zero(0)${NC}.\n\tIt might be a system or process container!"
+    fi
+}
+
+
+# Returns a color according to running/suspended jobs.
+function job_color()
+{
+    if [ $(jobs -s | wc -l) -gt "0" ]; then
+        echo -en ${BRed}
+    	JBC="${SS}There are ${BRed}too many jobs(processes)${NC running.}\n\tPlease close some of the windows\n\tand/or restart some."
+    elif [ $(jobs -r | wc -l) -gt "0" ] ; then
+        echo -en ${BCyan}
+    	JBC="${SS}You have ${BCyan}many jobs(processes)${NC} running!\n\tIt may cause a bottleneck soon!"
+    else
+    	echo -en ${BBlue}
+    	JBC="${SS}The jobs(processes) are ${BBlue}running fine${NC} so far."
+    fi
+}
+
+
+# Adds some text in the terminal frame (if applicable).
+
+# Now we construct the prompt.
+#PROMPT_COMMAND="history -a"
+case ${TERM} in
+  *term | rxvt )
+  	con_type
+  	usr_type
+  	#  Below PS1 is divided into two parts for accomodating 
+  	#+ gitprompt for denoting git repos locally
+
+        # User@Host (with connection type info):
+        PS1="\n\[${SU}${On_Black}\] \u\[${AT}\] @ \[${CNX}\]\h \[${NC}\]"
+
+        # PWD (with 'disk space' info):
+        PS11="${PS1}\[${On_Green}\]|PWD:\[\$(disk_color)${DBG}\] \w \[${NC}\]"
+
+        # Time of day (with load info):
+        PS11="${PS11}\n\[\$(load_color) \$(load)%\] @ \A \[${NC}\]"
+
+        # History counts [All:Current]):
+        PS11="${PS11}[\!:\#] \[\$(disk_color)\](\[${NC}\]\W"
+        
+        # set the second line of prompt with [history:cur-hist] (folder) shell prompt
+        PS12="${PS12}\[\$(disk_color)\]) \[${NC}\$(job_color)\]\s \$\[${NC}\]"
+
+        # Set title of current xterm:
+        PS12=${PS12}"\[\e]0;[\u@\h] \w\a \]"
+        
+        PS1="${PS11}${PS12}"
+        ;;
+    *)
+        PS11="(\A \u@\h \W " # --> PS1="(\A \u@\h \w) > "
+                               # --> Shows full pathname of current dir.
+        PS12=" ) > "
+
+        PS1="${PS11}${PS12}"
+
+        ;;
+esac
+
+function SHOW_PROMPT_HELP()
+{
+	PH=""
+	con_type
+	usr_type
+	load_color
+	disk_color
+	job_color
+	echo -e ${NC}${HR}${PH}${DSK}${LDC}${JBC}${HR};
+}
+
+#PH="${NC}${HR}${PH}${DSK}${LDC}${JBC}${HR}"
+
+#-------------------------------------------------------------
+# Tailoring 'less'
+#-------------------------------------------------------------
+
+#alias more='less'
+#export PAGER=less
+#export LESSCHARSET='latin1'
+#export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
+                # Use this if lesspipe.sh exists.
+#export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \
+#:stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
+
+# LESS man page colors (makes Man pages more readable).
+#export LESS_TERMCAP_mb=$'\E[01;31m'
+#export LESS_TERMCAP_md=$'\E[01;31m'
+#export LESS_TERMCAP_me=$'\E[0m'
+#export LESS_TERMCAP_se=$'\E[0m'
+#export LESS_TERMCAP_so=$'\E[01;44;33m'
+#export LESS_TERMCAP_ue=$'\E[0m'
+#export LESS_TERMCAP_us=$'\E[01;32m'
+
+#-------------------------------------------------------------

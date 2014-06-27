@@ -1,0 +1,133 @@
+#!/bin/bash
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Collection from : http://blog.twistedcode.org/2008/04/lscolors-explained.html
+# Also check these :
+# 	1. http://www.bigsoft.co.uk/blog/index.php/2008/04/11/configuring-ls_colors
+#	2. http://dailypackage.fedorabook.com/index.php?/archives/109-Wednesday-Why-Colour-ls.html
+#	3. https://github.com/trapd00r/LS_COLORS/blob/master/LS_COLORS
+# 	4. https://github.com/sorin-ionescu/prezto/pull/283
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Effects
+00	# Default colour
+01	# Bold
+04	# Underlined
+05	# Flashing text
+07	# Reversetd
+08	# Concealed
+# Colours
+30	# Black
+31	# Red
+32	# Green
+33	# Orange
+34	# Blue
+35	# Purple
+36	# Cyan
+37	# Grey
+# Backgrounds
+40	# Black background
+41	# Red background
+42	# Green background
+43	# Orange background
+44	# Blue background
+45	# Purple background
+46	# Cyan background
+47	# Grey background
+# Extra colours
+90	# Dark grey
+91	# Light red
+92	# Light green
+93	# Yellow
+94	# Light blue
+95	# Light purple
+96	# Turquoise
+97	# White
+100	# Dark grey background
+101	# Light red background
+102	# Light green background
+103	# Yellow background
+104	# Light blue background
+105	# Light purple background
+106	# Turquoise background
+
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+	
+	if [[ -f "$COLOR_DEFS" ]]; then 
+		. "$COLOR_DEFS"
+		user_spot=$'\e[01;36m'
+		user_host=$'\e[01;33m'
+		user_pwd=$'\e[01;37;42m'
+		user_shell=$'\e[01;34m'
+		if [[ $(id -u) == 0 ]]; then
+		    # it is 'root'
+		    user_type=$'\e[01;31;40m \u '
+		    user_prompt=$'\e[01;31m\$'
+		    
+		else
+		    # it is a non-'root' user
+		    user_type=$'\e[01;32;40m \u'
+		    user_prompt=$'\e[01;32m\$'
+		    
+		fi
+		PS11="${debian_chroot:+($debian_chroot)}\n$user_type \u $user_spot@$user_host \h \[\e[m\]$user_pwd| PWD: \w > \[\e[m\]\n[\!:\#] (\W"
+		PS12=") $user_shell\s $user_prompt\$\[\e[m\] "
+echo -e "A. Testing:\nPS1 = $PS11$PS12\n...Done"
+	else {
+		# Setting up bash prompt with color and info
+		# Also used for gitprompt
+		if [[ $(id -u) == 0 ]]; then
+		    # it is 'root'
+		    PS11='${debian_chroot:+($debian_chroot)}\n\[\e[01;31;40m\] \u \[\e[01;36m\]@\[\e[01;33m\] \h \[\e[m\]\[\e[01;37;42m\]| PWD: \w > \[\e[m\]\n[\!:\#] (\W'
+		    PS12=') \[\e[01;34m\]\s \[\e[01;31m\]\$\[\e[m\] '
+echo -e "B. Testing:\nPS1 = $PS11$PS12\n...Done"
+		else
+		    # it is a non-'root' user
+		    PS11='${debian_chroot:+($debian_chroot)}\n\[\e[01;32;40m\] \u \[\e[01;36m\]@\[\e[01;33m\] \h \[\e[m\]\[\e[01;37;42m\]| PWD: \w > \[\e[m\]\n[\!:\#] (\W'
+		    PS12=') \[\e[01;34m\]\s \$\[\e[m\] '
+echo -e "C. Testing:\nPS1 = $PS11$PS12\n...Done"
+		fi 
+		}
+	fi
+    else
+	color_prompt=
+    fi
+fi
+
+# Setting up bash prompt with color and info
+# Also used for gitprompt
+if [[ $(id -u) == 0 ]]; then
+    # it is 'root'
+    PS11='${debian_chroot:+($debian_chroot)}\n\[\e[01;31;40m\] \u \[\e[01;36m\]@\[\e[01;33m\] \h \[\e[m\]\[\e[01;37;42m\]| PWD: \w > \[\e[m\]\n[\!:\#] (\W'
+    PS12=') \[\e[01;34m\]\s \[\e[01;31m\]\$\[\e[m\] '
+else
+    # it is a non-'root' user
+    PS11='${debian_chroot:+($debian_chroot)}\n\[\e[01;32;40m\] \u \[\e[01;36m\]@\[\e[01;33m\] \h \[\e[m\]\[\e[01;37;42m\]| PWD: \w > \[\e[m\]\n[\!:\#] (\W'
+    PS12=') \[\e[01;34m\]\s \$\[\e[m\] '
+fi
+
+if [ "$color_prompt" = yes ]; then
+#    PS1='${debian_chroot:+($debian_chroot)}\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
+#    PS1='${debian_chroot:+($debian_chroot)}\n\[\e[01;32;40m\] \u \[\e[01;36m\]@\[\e[01;33m\] \h \[\e[00m\]\[\e[01;37;41m\]| PWD: \w > \[\e[00m\]\n[\!:\#] (\W) \[\e[01;31m\]\s \$\[\e[00m\] '
+    PS1="$PS11$PS12"
+#    PS1='${debian_chroot:+($debian_chroot)}\n\[\e[01;32;40m\] \u \[\e[01;36m\]@\[\e[01;33m\] \h \[\e[m\]\[\e[01;37;42m\]| PWD: \w > \[\e[m\]\n[\!:\#] (\W) \[\e[01;34m\]\s \$\[\e[m\] '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e[m\]\u@\h: \w\a$PS1"
+    #CWD=sed -i "s/$HOME/\~/g" ${PWD}
+    #PROMPT_COMMAND='echo -ne "\e]0;${USER}@${HOSTNAME}: ${PWD}\a"'
+    ;;
+*)
+    ;;
+esac
+

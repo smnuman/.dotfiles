@@ -1,0 +1,8 @@
+" http://arjanvandergaag.nl/blog/working-with-postgresql-on-the-command-line.html
+\set PROMPT1 '%n@%/\n%R%x%# '
+\set PROMPT2 '%R%x%# '
+\pset border 1
+\pset format wrapped
+\pset linestyle unicode
+\pset null NULL
+
