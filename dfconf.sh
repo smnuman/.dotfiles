@@ -40,11 +40,11 @@ files=(\
 	)
 
 gitpromptFiles=(\
-	gitprompt.sh
-	gitstatus.py
-	gitstatus.sh
-	git-prompt-colors.sh
-	git-prompt-help.sh
+	gitprompt.sh \
+	gitstatus.py \
+	gitstatus.sh \
+	git-prompt-colors.sh \
+	git-prompt-help.sh \
 	)
 
 #echo "Files are: ${files[*]}"
