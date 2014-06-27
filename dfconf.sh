@@ -60,7 +60,7 @@ fi
 
 # change to the dotfiles directory
 echo "Changing to the '$dir' directory"
-cd $dir
+# cd $dir
 echo "...done"
 
 move_this(){
