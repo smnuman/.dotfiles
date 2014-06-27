@@ -9,7 +9,47 @@
 dir=~/.dotfiles					# dotfiles directory
 olddir=~/dotfiles_old			# old dotfiles backup directory
 
-##########
+gitpromptdir=${dir}/GitPrompt 	# GitPrompt directory
+
+files=(\
+	bin \
+	.bashrc \
+	.bash_aliases \
+	.bash_colorprompt \
+	.colordefrc \
+	.colorrc \
+	.curlrc \
+	.gammurc \
+	.gitconfig \
+	.gitconfig.railsusr \
+	.gitconfig.smnuman \
+	.gitprompt.sh \
+	.git-completion.bash \
+	.histrc \
+	.inputrc \
+	.psqlrc \
+	.netrc \
+	.msmtprc \
+	.pgadmin3 \
+	.profile \
+	.selected_editor \
+	.ssh.config \
+	vim \
+	.vimrc \
+	.wgetrc \
+	)
+
+gitpromptFiles=(\
+	gitprompt.sh
+	gitstatus.py
+	gitstatus.sh
+	git-prompt-colors.sh
+	git-prompt-help.sh
+	)
+
+#echo "Files are: ${files[*]}"
+
+########## variables:done
 
 # create dotfiles_old in homedir
 if [[ ! -e "${olddir}" ]]; then
@@ -17,33 +57,6 @@ if [[ ! -e "${olddir}" ]]; then
 	mkdir -p $olddir
 	echo "...done"
 fi
-
-files=(\
-	bashrc \
-	bash_aliases \
-	bash_colorprompt \
-	colordefrc \
-	colorrc \
-	curlrc \
-	gammurc \
-	gitconfig \
-	gitconfig.railsusr \
-	gitconfig.smnuman \
-	gitprompt.sh \
-	inputrc \
-	psqlrc \
-	netrc \
-	msmtprc \
-	pgadmin3 \
-	profile \
-	selected_editor \
-	ssh.config \
-	vim \
-	vimrc \
-	histrc \
-	)
-
-#echo "Files are: ${files[*]}"
 
 # change to the dotfiles directory
 echo "Changing to the '$dir' directory"
@@ -53,7 +66,7 @@ echo "...done"
 move_this(){
 	if [[ ! -h ~/.$1 ]]; then {
 	    echo "Moving '$1' from ~/ to $olddir/"
-	    mv ~/.$1 $olddir/.${1}.bak 
+	    mv ~/$1 $olddir/${1}.bak 
 	} else	
 		echo "Skipping file: '.$1' --> link already exists!"
 	fi
@@ -61,12 +74,21 @@ move_this(){
 
 link_this(){
 	if [[ ! -h ~/.$1 ]]; then
-	    echo "Symlinking '$dir/.$1' --> '~/$1'"
-	    ln -snf $dir/.$1 ~/.$1
+	    echo "Symlinking '$dir/$1' --> '~/$1'"
+	    ln -snf $dir/$1 ~/$1
 	fi
 }
 
+link_in_folder_this(){
+	if [[ ! -h ~/.$1 ]]; then
+	    echo "Symlinking '$gitpromptdir/$1' --> '~/$1'"
+	    ln -snf $gitpromptdir/$1 ~/$1
+	fi
+}
+
+#
 # move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks 
+#
 for file in "${files[@]}"; do
 	# if the file exists then move it to a safe location
     [[ -e ~/.$file ]] && move_this $file 
@@ -74,3 +96,9 @@ for file in "${files[@]}"; do
 	link_this $file
 done
 
+#
+# Move files in "dotfiles/GitPrompt/" folder to "~"
+#
+for file in "${gitpromptFiles[@]}"; do
+	link_in_folder_this $file
+done
