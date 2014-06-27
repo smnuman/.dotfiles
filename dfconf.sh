@@ -6,10 +6,10 @@
 
 ########## Variables
 
-dir=~/.dotfiles					# dotfiles directory
-olddir=~/dotfiles_old			# old dotfiles backup directory
+dir=~/.dotfiles						# dotfiles directory
+olddir=~/dotfiles_old				# old dotfiles backup directory
 
-gitpromptdir=${dir}/GitPrompt 	# GitPrompt directory
+gitpromptdir=${dir}/_GitPrompt_ 	# GitPrompt directory
 
 files=(\
 	bin \
@@ -23,7 +23,6 @@ files=(\
 	.gitconfig \
 	.gitconfig.railsusr \
 	.gitconfig.smnuman \
-	.gitprompt.sh \
 	.git-completion.bash \
 	.histrc \
 	.inputrc \

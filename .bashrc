@@ -140,6 +140,8 @@ if [ -f ~/gitprompt.sh ]; then
 
     # as last entry source the gitprompt script
     . ~/gitprompt.sh
+else
+    echo "==========giptprompt not found======="
 fi
 
 # Alias definitions.
