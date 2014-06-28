@@ -32,6 +32,7 @@ files=(\
 	.pgadmin3 \
 	.profile \
 	.selected_editor \
+	.ssh \
 	.ssh.config \
 	vim \
 	.vimrc \
