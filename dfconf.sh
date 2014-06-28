@@ -15,14 +15,14 @@ files=(\
 	bin \
 	.bashrc \
 	.bash_aliases \
-	.bash_colorprompt \
-	.colordefrc \
+	# .bash_colorprompt \			# Not required, called with full-path to .dotfiles/
+	# .colordefrc \					# Not required, called with full-path to .dotfiles/
 	.colorrc \
 	.curlrc \
 	.gammurc \
-	.gitconfig \
-	.gitconfig.railsusr \
-	.gitconfig.smnuman \
+	# .gitconfig \
+	# .gitconfig.railsusr \
+	# .gitconfig.smnuman \
 	.git-completion.bash \
 	.histrc \
 	.inputrc \

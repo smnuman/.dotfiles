@@ -58,13 +58,16 @@ alias lt='ls -ltr;echo "==Sorted by date - recent last=="'            #  Sort by
 alias lc='ls -ltcr;echo "==Sorted by change time - recent last=="'    #  Sort by/show change time,most recent last.
 alias lu='ls -ltur;echo "==Sorted by access time - recent last=="'    #  Sort by/show access time,most recent last.
 
-alias lsl='_(){ la $@| \grep ^l; }; _'                      # List linked files & folders only
+# alias lsl='_(){ la $@| \grep ^l; && echo "\nNo more linked files!"; }; _'                      # List linked files & folders only
+alias lsl='_(){ (la $@| \grep ^l; )||( echo "No linked files found!";)  }; _'
 
-alias lsh="ls -dlv --group-directories-first .[^.]*"		# experimental : list hidden files and folders
+# alias lsh="ls -dlv --group-directories-first .[^.]*"		# experimental : list hidden files and folders
+alias lsh='_(){ ls -dlv --group-directories-first .[^.]* ; }; _'
+alias lsh='_(){ dirvalue=".[^.]*" ; [[ -e $@ && dirvalue=$@  ]]; ( ls -dlv --group-directories-first ${dirvalue} ) || ( echo "There are NO hidden files in here(${dirvalue})!"); }; _'
 alias lhd='_(){ lsh $@| grep ^d; }; _'						# experimental : list hidden folders only
 alias lhf='_(){ lsh $@| grep -v ^d | grep -v ~$; }; _'		# experimental : list only hidden files, & not folders
 
-alias lsf='_(){ ll $@| grep -v ^[d|l]; }; _'								# experimental : list non-hidden files only, & no folders
+alias lsf='_(){ ( ll $@| grep -v ^[dl]; )||( echo "No files in this folder!"; ) }; _'								# experimental : list non-hidden files only, & no folders
 alias lsd='_(){ ll $@| \grep ^d; }; _'									# experimental : list non-hidden folders only, & no files
 alias lsb='_(){ lsh $@| grep ~$; }; _'									# experimental : list backup files only
 
