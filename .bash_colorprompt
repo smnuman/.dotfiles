@@ -66,13 +66,13 @@ function CurD(){ echo ${PWD/"$HOME"/"~"}; }
 function con_type()
 {
 	if [ -n "${SSH_CONNECTION}" ]; then
-	    CNX=${Green}        # Connected on remote machine, via ssh (good).
-	    PH=${PH}"${SS}The system is connected to a remote machine (${CNX}via ssh${NC})."
+	    CNX=${BGreen}${On_Black}           # Connected on remote machine, via ssh (good).
+	    PH=${PH}"${SS}The system is connected to a remote machine (${CNX} via ssh ${NC})."
 	elif [[ "${DISPLAY%%:0*}" != "" ]]; then
-	    CNX=${ALERT}        # Connected on remote machine, not via ssh (bad).
-	    PH=${PH}"${SS}The system is connected to a remote machine (${CNX}without ssh${NC})."
+	    CNX=${ALERT}                       # Connected on remote machine, not via ssh (bad).
+	    PH=${PH}"${SS}The system is connected to a remote machine (${CNX} without ssh ${NC})."
 	else
-	    CNX=${BYellow}        # Connected on local machine.
+	    CNX=${BYellow}${On_Black}          # Connected on local machine.
 	    PH=${PH}"${SS}The system is a ${CNX}local${NC} machine."
 	fi
 }
@@ -103,8 +103,8 @@ function usr_type()
 #  Numan's mod: add background. Also $BGreen instead of $BCyan above for normal user.
 #  Set a background. Also there is a DeepBackground($DBG) set above according to the user!
 BG=${On_Black}
-CNX=$CNX"${BG}"
-SU=$SU"${BG}"
+CNX=${CNX}"${BG}"
+SU=${SU}"${BG}"
 AT=${BCyan}"${BG}"
 
 

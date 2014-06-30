@@ -8,17 +8,35 @@
 # for ssh logins, install and configure the libpam-umask package.
 umask 022
 
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
-    fi
-fi
+#
+# if running bash 			:: duplicated below, see below
+#
+# if [ -n "$BASH_VERSION" ]; then
+#     # include .bashrc if it exists
+#     if [ -f "$HOME/.bashrc" ]; then
+# 	. "$HOME/.bashrc"
+#     fi
+# fi
+
+#
+# If running 'bash' and has a '.bashrc' file source that now
+#
+[[ -n "$BASH_VERSION" ]] && [[ -r "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
 
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+# Adding path safely ---
+# [[ :$PATH: != *:/my/dir:* ]] && PATH+=:/my/dir 
+# ------------------------
+# ---OR---
+# Add :
+# ((SHLVL>1)) || 
+
+((SHLVL>1)) || export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+### Added by the Heroku Toolbelt
+((SHLVL>1)) || export PATH="/usr/local/heroku/bin:$PATH"

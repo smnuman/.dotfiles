@@ -1,4 +1,4 @@
-"
+" Vim color file 
 " Fruity Color Scheme
 " ===================
 "

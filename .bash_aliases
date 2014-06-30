@@ -34,7 +34,7 @@ alias ...='cd ../..'
 # Pretty-print of some PATH variables:
 alias path='echo -e ${PATH//:/\\n}'
 alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}'
-alias dircolors='echo -e ${dircolors//:/\\n}'
+# alias dircolors='echo -e ${dircolors//:/\\n}'
 alias lscolors='echo -e ${LS_COLORS//:/\\n}'
 
 # Filesystem diskspace usage
@@ -50,8 +50,12 @@ alias ls='ls -hG --color'											# Makes sure to show inode of the file and/o
 
 # --------------------------------
 # |          nmn - start         |
-# ---------------------------------
+# --------------------------------
+# For additional info on ls switches:
+# 	- https://www.mkssoftware.com/docs/man1/ls.1.asp
+# 	- http://www.commandlinefu.com/commands/view/4138/list-all-symbolic-links-in-current-directory
 
+# handle file-list in a sorted way
 alias lx='ls -lXB;echo "==Sorted by eXtension=="'                     #  Sort by extension.
 alias lk='ls -lSr;echo "==Sorted by size - biggest last=="'           #  Sort by size, biggest last.
 alias lt='ls -ltr;echo "==Sorted by date - recent last=="'            #  Sort by date, most recent last.
@@ -61,19 +65,22 @@ alias lu='ls -ltur;echo "==Sorted by access time - recent last=="'    #  Sort by
 # alias lsl='_(){ la $@| \grep ^l; && echo "\nNo more linked files!"; }; _'                      # List linked files & folders only
 alias lsl='_(){ (la $@| \grep ^l; )||( echo "No linked files found!";)  }; _'
 
-# alias lsh="ls -dlv --group-directories-first .[^.]*"		# experimental : list hidden files and folders
-alias lsh='_(){ ls -dlv --group-directories-first .[^.]* ; }; _'
-alias lsh='_(){ dirvalue=".[^.]*" ; [[ -e $@ && dirvalue=$@  ]]; ( ls -dlv --group-directories-first ${dirvalue} ) || ( echo "There are NO hidden files in here(${dirvalue})!"); }; _'
-alias lhd='_(){ lsh $@| grep ^d; }; _'						# experimental : list hidden folders only
-alias lhf='_(){ lsh $@| grep -v ^d | grep -v ~$; }; _'		# experimental : list only hidden files, & not folders
+# handle hidden files
+alias lh="ls -dlvF --group-directories-first .[^.]*"									# experimental : list hidden files and folders
+alias lsh='_(){ originaldir=$PWD; cd $1; lh; cd $originaldir; unset originaldir; }; _' 	# experimental : list files in a specific dir
+# alias lhd='_(){ lsh $@| grep ^d; }; _'												# experimental : list hidden folders only
+alias lhd='_(){ lsh $@| grep /$; }; _'													# experimental : list hidden folders only
+alias lhf='_(){ lsh $@| grep -v ^d | grep -v ~$; }; _'									# experimental : list only hidden files, & not folders
 
+# handle only non hidden files OR non-hidden folders
 alias lsf='_(){ ( ll $@| grep -v ^[dl]; )||( echo "No files in this folder!"; ) }; _'								# experimental : list non-hidden files only, & no folders
-alias lsd='_(){ ll $@| \grep ^d; }; _'									# experimental : list non-hidden folders only, & no files
-alias lsb='_(){ lsh $@| grep ~$; }; _'									# experimental : list backup files only
+alias lsd='_(){ ll $@| \grep ^d; }; _'													# experimental : list non-hidden folders only, & no files
+
+alias lsb='_(){ lsh $@| grep ~$; }; _'													# experimental : list backup files only
 
 # Modified commands
 alias sudo='sudo '
-#alias apt-get="apt-fast"
+alias apt-get="apt-fast"
 alias uu='sudo apt-get --quiet update && sudo apt-get --yes --quiet upgrade'
 alias ud='sudo apt-get --quiet update && sudo apt-get --yes --quiet dist-upgrade'
 
@@ -84,7 +91,7 @@ alias 600='chmod 600'
 alias 644='chmod 644'
 alias 755='chmod 755'
 
-## copying background image to safety
+## copying desktop background image to safety
 alias cpbg='sudo cp ~/.config/ubuntu-tweak/lovewallpaper.jpg /usr/share/backgrounds/lwp-$(date +'\%y\%m\%d-\%H\%M\%S').jpg'
 alias alertbgcp='notify-send -u normal -i "$([ $? = 0 ] && echo ubuntu-tweak || echo terminal || echo error )" "Wallpaper saved" "LoveWallPaper.jpg copied successfully!"'
 alias sbp='cpbg;alertbgcp'
