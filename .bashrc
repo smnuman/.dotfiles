@@ -5,6 +5,7 @@
 
 # Scripts Debug switch, default '0', for verbose set it to something >1
 DEBUG=0
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -15,11 +16,15 @@ FULLUSERNAME=`cat /etc/passwd | grep -Ew ^$USER | cut -d":" -f5 | cut -d"," -f1`
 # .dotfiles root: normally it should be located at ~/.dotfiles . But if you want 
 # it somewhere more convenient, quote the path here!
 #
-# Path Variable defs ===============
-DF_ROOT=~/.dotfiles                         # dotfiles root 
-HIST_BUP=${DF_ROOT}/bin/history-backup      # history backup script
-COLOR_DEFS=${DF_ROOT}/.colordefrc           # color definitions for prompt preperation or other things
-COLOR_PROMPT=${DF_ROOT}/.bash_colorprompt   # color prompt creation script
+# Path Variable defs ===============    
+DF_ROOT=~/.dotfiles                             # dotfiles root 
+HIST_RC=${DF_ROOT}/.histrc
+HIST_BUP=${DF_ROOT}/bin/history-backup          # history backup script
+COLOR_DEFS=${DF_ROOT}/.colordefrc               # color definitions for prompt preperation or other things
+COLOR_PROMPT=${DF_ROOT}/.bash_colorprompt       # color prompt creation script
+BASH_ALIASES=${DF_ROOT}/.bash_aliases           # Lots of custom aliases to add
+GIT_COMPLETE=${DF_ROOT}/.git-completion.bash    # git-completion.bash script
+GIT_SCRIPT=${DF_ROOT}/_GitPrompt_/gitprompt.sh  # git prompt setup script
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -39,8 +44,8 @@ shopt -s histreedit
 shopt -s histverify
 
 # formating history better
-if [ -f "./.histrc" ]; then
-    . ./.histrc
+if [ -f "${HIST_RC}" ]; then
+    . "${HIST_RC}"
 fi
 
 # Saving history backup
@@ -124,7 +129,7 @@ alias l='ls -CF'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-export LS_COLORS="$LS_COLORS:*rc=93;100" # testing only
+export LS_COLORS="*rc=93;100:$LS_COLORS" # testing only
 # export LS_COLORS="$LS_COLORS:*rc=01;33;40" # testing only
 # unset LS_COLORS
 # export LS_COLORS=
@@ -135,7 +140,7 @@ export LS_COLORS="$LS_COLORS:*rc=93;100" # testing only
 # Optional addition:     .git-prompt-colors.sh
 #------------------ Numan ---------------------------------
 # If a userspecific gitconfig is available, then use it, saving the old one.
-#[[ -f ~/.gitconfig.$USER ]] && { ( [[ -f ~/.gitconfig ]] && mv ~/.gitconfig ~/.gitconfig.save.$(date); ); cp -f -i ~/.gitconfig.$USER ~/.gitconfig; }
+# [[ -f ~/.gitconfig.$USER ]] && { ( [[ -f ~/.gitconfig ]] && mv ~/.gitconfig ~/.gitconfig.save.$(date); ); cp -f -i ~/.gitconfig.$USER ~/.gitconfig; }
 
 # A bash prompt that displays information about the current git repository. 
 # In particular the branch name, difference with remote branch, 
@@ -165,7 +170,6 @@ export LS_COLORS="$LS_COLORS:*rc=93;100" # testing only
 # When the branch name starts with a colon :, it means it's actually a hash, not a branch 
 # (although it should be pretty clear, unless you name your branches like hashes :-)
 #
-GIT_SCRIPT=${DF_ROOT}/_GitPrompt_/gitprompt.sh
 if [ -f ${GIT_SCRIPT} ]; then
     # gitprompt configuration
     GIT_PROMPT_START=$PS11
@@ -182,8 +186,8 @@ else
     echo "==========================================="
 fi
 
-if [ -f ${DF_ROOT}/.git-completion.bash ]; then
-	. ${DF_ROOT}/.git-completion.bash
+if [ -f ${GIT_COMPLETE} ]; then
+	. ${GIT_COMPLETE}
     ((DEBUG>1)) && echo "- git-completion.bash Added"
 fi
 
@@ -191,15 +195,15 @@ GLOBIGNORE=.:..
 # http://mywiki.wooledge.org/glob#extglob for aliased functions
 #shopt -s extglob
 # http://mywiki.wooledge.org/glob#dotglob for not matching . & ..
-#shopt -s dotglob 
+shopt -s dotglob 
 #shopt -s nullglob
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-if [ -f ${DF_ROOT}/.bash_aliases ]; then
-    . ${DF_ROOT}/.bash_aliases
+if [ -f ${BASH_ALIASES} ]; then
+    . ${BASH_ALIASES}
 fi
 
 # uncomment below if using CentOS and also for bash_aliases .
@@ -211,4 +215,40 @@ export EDITOR=vim
 # 	. ${DF_ROOT}/.lscolorsrc
 # fi
 
-# Add all additional path should go to .profile and not to .bashrc
+
+#-------------------------------------------------------------
+# Tailoring 'less'
+#-------------------------------------------------------------
+
+#alias more='less'
+#export PAGER=less
+#export LESSCHARSET='latin1'
+#export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
+                # Use this if lesspipe.sh exists.
+#export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \
+#:stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
+
+# LESS man page colors (makes Man pages more readable).
+#export LESS_TERMCAP_mb=$'\E[01;31m'
+#export LESS_TERMCAP_md=$'\E[01;31m'
+#export LESS_TERMCAP_me=$'\E[0m'
+#export LESS_TERMCAP_se=$'\E[0m'
+#export LESS_TERMCAP_so=$'\E[01;44;33m'
+#export LESS_TERMCAP_ue=$'\E[0m'
+#export LESS_TERMCAP_us=$'\E[01;32m'
+
+#-------------------------------------------------------------
+
+# Garbage collection
+unset DF_ROOT
+unset HIST_RC
+unset HIST_BUP
+unset COLOR_DEFS
+unset COLOR_PROMPT
+# unset BASH_ALIASES
+unset GIT_COMPLETE
+unset GIT_SCRIPT
+
+unset DEBUG
+
+# All additional path should go to .profile and not to .bashrc

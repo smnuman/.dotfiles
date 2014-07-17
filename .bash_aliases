@@ -23,7 +23,7 @@ alias wtf='_(){ SHOW_PROMPT_HELP; }; _' 	# Shows prompt info
 # Move a file to .dotfiles folder and symbolically Link to it from ~
 alias ml.dir='_(){ mv ~/$1 ~/.dotfiles/$1; ln -sfn ~/.dotfiles/$1 ~/$1; }; _'
 
-alias h='history'
+alias h='_(){ grep "$@" -n -h ~/bash_history ~/.bash_history.* ; }; _'
 alias j='jobs -l'
 alias which='type -a'
 
@@ -66,14 +66,15 @@ alias lu='ls -ltur;echo "==Sorted by access time - recent last=="'    #  Sort by
 alias lsl='_(){ (la $@| \grep ^l; )||( echo "No linked files found!";)  }; _'
 
 # handle hidden files
+alias chd='_(){ ( [ ! -z $1 ] && [ -d $1  ] ) &&  cd $1  || echo "Failed !"; }; _'	# change directory if it is a directory
 alias lh="ls -dlvF --group-directories-first .[^.]*"									# experimental : list hidden files and folders
-alias lsh='_(){ originaldir=$PWD; cd $1; lh; cd $originaldir; unset originaldir; }; _' 	# experimental : list files in a specific dir
+alias lsh='_(){ originaldir=$PWD; chd $1; lh; cd $originaldir; unset originaldir; }; _' # experimental : list files in a specific dir
 # alias lhd='_(){ lsh $@| grep ^d; }; _'												# experimental : list hidden folders only
 alias lhd='_(){ lsh $@| grep /$; }; _'													# experimental : list hidden folders only
 alias lhf='_(){ lsh $@| grep -v ^d | grep -v ~$; }; _'									# experimental : list only hidden files, & not folders
 
 # handle only non hidden files OR non-hidden folders
-alias lsf='_(){ ( ll $@| grep -v ^[dl]; )||( echo "No files in this folder!"; ) }; _'								# experimental : list non-hidden files only, & no folders
+alias lsf='_(){ ( ll $@| grep -v ^[dl]; )||( echo "No files in this folder\!"; ) }; _'								# experimental : list non-hidden files only, & no folders
 alias lsd='_(){ ll $@| \grep ^d; }; _'													# experimental : list non-hidden folders only, & no files
 
 alias lsb='_(){ lsh $@| grep ~$; }; _'													# experimental : list backup files only
@@ -98,6 +99,9 @@ alias sbp='cpbg;alertbgcp'
 
 # Find list of current ppa sources
 alias lsppa='cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list | grep ppa $*'
+
+# Remove Duplicate PPAs from the list
+alias rm-dup-ppa='cat /etc/apt/sources.list | perl -ne \''$H{$_}++ or print\'' > /tmp/sources.list && sudo mv /tmp/sources.list /etc/apt/sources.lis'
 
 # Cleaning $HOME folder
 alias gout='sudo \rm -I ~/.goutputstream-* -v'
@@ -128,7 +132,7 @@ alias gini='_(){ echo "RUNNING CMD: git init"; git init; }; _'
 alias g.='_(){ echo "RUNNING CMD: \"git add -A\""; git add -A ; }; _'
 alias gadd='_(){ echo -e "RUNNING CMD: git add \"$@\""; git add $@; }; _'
 alias gcomm='_(){ echo -e "RUNNING CMD: git commit -m \"$1\""; git commit -m \""$1\""; }; _'
-alias gradd='_(){ echo -e "RUNNING CMD: git remote add origin http://github.com/railsusr/$1.git"; git remote add origin http://github.com/railsusr/$1.git; }; _'
+alias gradd='_(){ echo -e "RUNNING CMD: git remote add origin http://github.com/$USER/$1.git"; git remote add origin http://github.com/$USER/$1.git; }; _'
 alias gpush='_(){ echo "git push -u origin master"; git push -u origin master; }; _'
 alias glob='git config --global -l'
 alias gloc='git config --local -l'
@@ -190,7 +194,7 @@ alias findbig="find . -type f -exec ls -s {} \; | sort -n -r | head -5"
 
 # Working with these dotfiles made easier
 alias reb='source ~/.bashrc'
-alias ea='_(){ echo -e "Editing aliases ... "; editor ~/.bash_aliases; echo "Reloading aliases ... "; reb; echo " ... done!"; }; _' # Edit aliases
+alias ea='_(){ echo -e "Editing aliases ... "; "${EDITOR}" "${BASH_ALIASES}"; echo "Reloading aliases ... "; reb; echo " ... done!"; }; _' # Edit aliases
 
 #echo -e '\n******Before/after this line in .bash_aliases********\n'
 
@@ -237,7 +241,7 @@ alias gm='git merge --no-ff --no-commit'
 alias gmc='git ls-files --unmerged | cut -f2 | uniq' # git merge conflicts
 alias gmf='git commit -F .git/MERGE_MSG'
 alias gmnff='git merge --no-ff'
-alias go='git checkout'
+# alias go='git checkout' 		# conflicts with go lang environment; for 'git checkout' use 'git co' <-- this is a 'git global alias'
 alias gp='git push'
 alias gpom='git push origin master'
 alias gpp='git push -u origin `git rev-parse --abbrev-ref HEAD`'

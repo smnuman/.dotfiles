@@ -16,7 +16,7 @@
 
 KEEP=200											# number of histories to keep in the .bash_history
 BASH_HIST=~/.bash_history							# history file name
-BACKUP=$BASH_HIST.$(date +%y%m%d).$(date +%H)		# name of history_backup file with appended date-time info
+BACKUP=$BASH_HIST.$(date +%y%m) 					# name of history_backup file with appended date-time info
 
 if [ -s "$BASH_HIST" -a "$BASH_HIST" -nt "$BACKUP" ]; then
 	# history file is newer then backup

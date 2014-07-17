@@ -13,18 +13,22 @@ gitpromptdir=${dir}/_GitPrompt_ 	# GitPrompt directory
 
 files=(\
 	bin \
+	vim \
 	.bashrc \
-	.bash_aliases \
+	# .bash_aliases \
+	.bash_logout \
+	.bash_profile \
 	# .bash_colorprompt \			# Not required, called with full-path to .dotfiles/
 	# .colordefrc \					# Not required, called with full-path to .dotfiles/
-	.colorrc \
+	# .colorrc \
 	.curlrc \
-	.gammurc \
+	# .gammurc \
+	.gemrc \
 	# .gitconfig \
 	# .gitconfig.railsusr \
 	# .gitconfig.smnuman \
-	.git-completion.bash \
-	.histrc \
+	# .git-completion.bash \
+	# .histrc \
 	.inputrc \
 	.psqlrc \
 	.netrc \
@@ -34,14 +38,13 @@ files=(\
 	.selected_editor \
 	.ssh \
 	.ssh.config \
-	vim \
 	.vimrc \
 	.wgetrc \
 	)
 
 gitpromptFiles=(\
 	gitprompt.sh \
-	gitstatus.py \
+	# gitstatus.py \
 	gitstatus.sh \
 	git-prompt-colors.sh \
 	git-prompt-help.sh \

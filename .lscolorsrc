@@ -15,7 +15,7 @@ export LS_COLORS=$( \
 # list one per line
 
 # these are basic filesystem items
-no 00          # normal
+#no 00          # normal
 fi 00          # file
 di 00 34       # directory
 ln 00 36       # link
@@ -115,7 +115,7 @@ ex 00 91       # executable
 *.yml    95
 *.conf   95
 
-[.a-z0-9]*rc 95
+# [.a-z0-9]*rc 95
 ")
 
 #echo GOT: $LS_COLORS

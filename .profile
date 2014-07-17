@@ -40,3 +40,6 @@ fi
 
 ### Added by the Heroku Toolbelt
 ((SHLVL>1)) || export PATH="/usr/local/heroku/bin:$PATH"
+
+### Added for nmp
+((SHLVL>1)) || export PATH="$HOME/npm/bin:$PATH"
