@@ -23,7 +23,7 @@ alias wtf='_(){ SHOW_PROMPT_HELP; }; _' 	# Shows prompt info
 # Move a file to .dotfiles folder and symbolically Link to it from ~
 alias ml.dir='_(){ mv ~/$1 ~/.dotfiles/$1; ln -sfn ~/.dotfiles/$1 ~/$1; }; _'
 
-alias h='_(){ grep "$@" -n -h ~/bash_history ~/.bash_history.* ; }; _'
+alias h='_(){ grep "$@" -n -h ~/.bash_history ~/.bash_history.* ; }; _'
 alias j='jobs -l'
 alias which='type -a'
 

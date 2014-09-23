@@ -12,7 +12,7 @@ olddir=~/dotfiles_old				# old dotfiles backup directory
 gitpromptdir=${dir}/_GitPrompt_ 	# GitPrompt directory
 
 files=(\
-	bin \
+	bin/ \
 	.axelrc \
 	.bashrc \
 	# .bash_aliases \
@@ -36,9 +36,9 @@ files=(\
 	.pgadmin3 \
 	.profile \
 	.selected_editor \
-	.ssh \
+	.ssh/ \
 	.ssh.config \
-	.vim \
+	.vim/ \
 	.vimrc \
 	.wgetrc \
 	)
