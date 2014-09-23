@@ -13,7 +13,7 @@ gitpromptdir=${dir}/_GitPrompt_ 	# GitPrompt directory
 
 files=(\
 	bin \
-	vim \
+	.axelrc \
 	.bashrc \
 	# .bash_aliases \
 	.bash_logout \
@@ -38,6 +38,7 @@ files=(\
 	.selected_editor \
 	.ssh \
 	.ssh.config \
+	.vim \
 	.vimrc \
 	.wgetrc \
 	)
