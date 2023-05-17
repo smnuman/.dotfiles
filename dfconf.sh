@@ -63,9 +63,9 @@ if [[ ! -e "${olddir}" ]]; then
 fi
 
 # change to the dotfiles directory
-echo "Changing to the '$dir' directory"
+# echo "Changing to the '$dir' directory"
 # cd $dir
-echo "...done"
+# echo "...done"
 
 move_this(){
 	if [[ ! -h ~/.$1 ]]; then {
